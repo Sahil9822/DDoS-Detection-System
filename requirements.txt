@@ -1,6 +1,4 @@
-aiohttp @ file:///C:/b/abs_27h_1rpxgd/croot/aiohttp_1707342354614/work
-aioitertools @ file:///tmp/build/80754af9/aioitertools_1607109665762/work
-aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
+
 alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
 altair @ file:///C:/b/abs_27reu1igbg/croot/altair_1687526066495/work
 anaconda-anon-usage @ file:///C:/b/abs_95v3x0wy8p/croot/anaconda-anon-usage_1697038984188/work
