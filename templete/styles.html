@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DDoS Detection System</title>
+  <link rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    
+    section {
+      margin-bottom: 20px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    section:last-of-type {
+      border-bottom: none;
+    }
+    
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    
+    button:hover {
+      background-color: #0056b3;
+    }
+    
+    label {
+      font-weight: bold;
+    }
+    
+    #simulated-packets,
+    #detection-result,
+    #accuracy-result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      white-space: pre-wrap;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>DDoS Detection System</h1>
+
+    <!-- Simulate Traffic Section -->
+    <section>
+      <h2>Simulate Traffic</h2>
+      <label for="traffic-type">Traffic Type:</label>
+      <select id="traffic-type">
+        <option value="normal">Normal Traffic</option>
+        <option value="attack">Attack Traffic</option>
+      </select>
+      <button id="simulate-btn">Simulate Traffic</button>
+      <div id="simulated-packets"></div>
+    </section>
+
+    <!-- Detect DDoS Section -->
+    <section>
+      <h2>Detect DDoS</h2>
+      <button id="detect-btn">Detect DDoS Attack</button>
+      <div id="detection-result"></div>
+    </section>
+
+    <!-- Evaluate Accuracy Section -->
+    <section>
+      <h2>Evaluate Accuracy</h2>
+      <button id="accuracy-btn">Calculate Accuracy</button>
+      <div id="accuracy-result"></div>
+    </section>
+  </div>
+
+  <script>
+    const simulateBtn = document.getElementById("simulate-btn");
+const detectBtn = document.getElementById("detect-btn");
+const accuracyBtn = document.getElementById("accuracy-btn");
+
+const trafficTypeSelect = document.getElementById("traffic-type");
+const simulatedPacketsDiv = document.getElementById("simulated-packets");
+const detectionResultDiv = document.getElementById("detection-result");
+const accuracyResultDiv = document.getElementById("accuracy-result");
+
+let simulatedPackets = [];
+
+// Simulate Traffic
+simulateBtn.addEventListener("click", async () => {
+  const trafficType = trafficTypeSelect.value;
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:5000/simulate?type=${trafficType}`
+    );
+    if (!response.ok) throw new Error("Failed to simulate traffic");
+
+    const data = await response.json();
+    simulatedPackets = data.packets;
+    simulatedPacketsDiv.textContent = `Simulated Packets:\n${JSON.stringify(
+      simulatedPackets,
+      null,
+      2
+    )}`;
+  } catch (error) {
+    console.error("Error:", error);
+    simulatedPacketsDiv.textContent = "Error simulating traffic.";
+  }
+});
+
+// Detect DDoS
+detectBtn.addEventListener("click", async () => {
+  if (simulatedPackets.length === 0) {
+    detectionResultDiv.textContent = "No packets to analyze. Simulate traffic first.";
+    return;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:5000/detect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ packets: simulatedPackets }),
+    });
+    if (!response.ok) throw new Error("Failed to detect DDoS");
+
+    const data = await response.json();
+    detectionResultDiv.textContent = `Detection Result:\nNormal Entropy: ${data.normal_entropy}\nCurrent Entropy: ${data.current_entropy}\nDDoS Detected: ${data.ddos_detected ? "Yes" : "No"}`;
+  } catch (error) {
+    console.error("Error:", error);
+    detectionResultDiv.textContent = "Error detecting DDoS attack.";
+  }
+});
+
+// Evaluate Accuracy
+accuracyBtn.addEventListener("click", async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:5000/accuracy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        true_positive: 1, // Example values
+        false_positive: 0,
+        true_negative: 1,
+        false_negative: 0,
+      }),
+    });
+    if (!response.ok) throw new Error("Failed to calculate accuracy");
+
+    const data = await response.json();
+    accuracyResultDiv.textContent = `Accuracy: ${data.accuracy}`;
+  } catch (error) {
+    console.error("Error:", error);
+    accuracyResultDiv.textContent = "Error calculating accuracy.";
+  }
+});
+
+  </script>
+</body>
+</html>
