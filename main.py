@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 import math
 import random
@@ -54,6 +54,13 @@ def calculate_accuracy(true_positive, false_positive, true_negative, false_negat
 # Baseline entropy for normal traffic
 normal_packets = simulate_packet_flow(attack=False)
 normal_entropy = calculate_entropy(normal_packets)
+
+@app.route('/')
+def index():
+    """
+    Renders the index page with a simple interface.
+    """
+    return render_template('index.html')
 
 # Flask Endpoints
 @app.route('/simulate', methods=['GET'])
